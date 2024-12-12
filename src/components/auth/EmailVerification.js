@@ -1,61 +1,67 @@
-import React, { useEffect, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
-import { applyActionCode } from "firebase/auth"
-import { auth } from "../../config/Firebase"
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { applyActionCode, onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../config/Firebase";
 
 const EmailVerification = () => {
-  const [verifying, setVerifying] = useState(true)
-  const [error, setError] = useState("")
-  const location = useLocation()
-  const navigate = useNavigate()
+  const [verifying, setVerifying] = useState(false); // Button controls verification
+  const [error, setError] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const verifyEmail = async () => {
-      console.log('verification url', window.location.href);
-      console.log('searchParams', location.search);
-      const actionCode = new URLSearchParams(location.search).get("oobCode");
-      console.log('actionCode', actionCode);
-      if (actionCode) {
-        try {
-          const check = await applyActionCode(auth, actionCode);
-          console.log('check', check);
-          // Send request to backend to update `hasVerified`
-          const response = await fetch("http://localhost:3001/api/authenticate/auth/verify-user-email", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email: auth.currentUser.email }),
-          });
-  
-          if (!response.ok) {
-            throw new Error("Failed to update verification status in the backend.");
+  const handleVerify = async () => {
+    const actionCode = new URLSearchParams(location.search).get("oobCode");
+    if (!actionCode) {
+      setError("Invalid verification link.");
+      return;
+    }
+
+    try {
+      await applyActionCode(auth, actionCode);
+
+      // Wait for auth state to update
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          try {
+            const response = await fetch("http://localhost:3001/api/authenticate/auth/verify-user-email", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ email: user.email }),
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to update verification status in the backend.");
+            }
+
+            setError("");
+            navigate("/login"); // Redirect to login after success
+          } catch (backendError) {
+            setError("Backend verification failed.");
+            console.error(backendError);
           }
-  
-          setVerifying(false);
-          setTimeout(() => navigate("/login"), 3000);
-        } catch (error) {
-          setError("Email verification failed. Please try again.");
-          console.error(error);
+        } else {
+          setError("No authenticated user found.");
         }
-      } else {
-        setError("Invalid verification link.");
-      }
-      setVerifying(false);
-    };
-  
-    verifyEmail();
-  }, [location, navigate]);
-  
-  if (verifying) {
-    return <div>Verifying your email...</div>
-  }
+      });
+    } catch (err) {
+      setError("Email verification failed. Please try again.");
+      console.error(err);
+    }
+  };
 
-  if (error) {
-    return <div>{error}</div>
-  }
-
-  return <div>Email verified successfully. Redirecting to login page...</div>
-}
+  return (
+    <div>
+      <h1>Email Verification</h1>
+      {verifying ? (
+        <div>Verifying your email...</div>
+      ) : (
+        <button onClick={() => setVerifying(true) || handleVerify()}>Verify Email</button>
+      )}
+      {error && <div style={{ color: "red" }}>{error}</div>}
+    </div>
+  );
+};
 
 export default EmailVerification;
