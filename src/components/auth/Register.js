@@ -48,6 +48,7 @@ const Register = () => {
         const errorData = await response.json()
         throw new Error(errorData.message || "Registration failed")
       }
+      window.localStorage.setItem("emailForSignIn", formData.email);
 
       setSuccess("Registration successful. Redirecting to the homepage...")
       setTimeout(() => {
