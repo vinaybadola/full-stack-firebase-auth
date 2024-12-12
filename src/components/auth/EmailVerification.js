@@ -11,11 +11,14 @@ const EmailVerification = () => {
 
   useEffect(() => {
     const verifyEmail = async () => {
+      console.log('verification url', window.location.href);
+      console.log('searchParams', location.search);
       const actionCode = new URLSearchParams(location.search).get("oobCode");
+      console.log('actionCode', actionCode);
       if (actionCode) {
         try {
-          await applyActionCode(auth, actionCode);
-  
+          const check = await applyActionCode(auth, actionCode);
+          console.log('check', check);
           // Send request to backend to update `hasVerified`
           const response = await fetch("http://localhost:3001/api/authenticate/auth/verify-user-email", {
             method: "POST",
