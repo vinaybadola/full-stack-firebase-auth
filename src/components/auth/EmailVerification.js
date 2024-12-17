@@ -19,13 +19,14 @@ const EmailVerification = () => {
         try {
           const check = await applyActionCode(auth, actionCode);
           console.log('check', check);
+          console.log('getEmail', window.localStorage.getItem("emailForSignIn"));
           // Send request to backend to update `hasVerified`
           const response = await fetch("https://firebase-backend-one.vercel.app/api/auth/verify-email", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email: window.localStorage.getItem("emailForSignIn"), oobCode: actionCode }),
+            body: JSON.stringify({ email : "vinaybadola46@gmail.com", oobCode: actionCode }),
           });
           console.log('response', response);
           if (!response.ok) {
