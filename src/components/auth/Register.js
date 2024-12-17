@@ -34,7 +34,7 @@ const Register = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:3001/api/authenticate/auth/register",
+        "https://firebase-backend-one.vercel.app/api/auth/register",
         {
           method: "POST",
           headers: {
@@ -56,6 +56,7 @@ const Register = () => {
       }, 2000) // Redirect after 2 seconds
     } catch (error) {
       if (error instanceof Error) {
+        alert('error', error);
         setError(error.message)
       } else {
         setError("An unexpected error occurred")

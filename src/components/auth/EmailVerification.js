@@ -20,14 +20,14 @@ const EmailVerification = () => {
           const check = await applyActionCode(auth, actionCode);
           console.log('check', check);
           // Send request to backend to update `hasVerified`
-          const response = await fetch("http://localhost:3001/api/authenticate/auth/verify-user-email", {
+          const response = await fetch("https://firebase-backend-one.vercel.app/api/auth/verify-email", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email: window.localStorage.getItem("emailForSignIn") }),
+            body: JSON.stringify({ email: window.localStorage.getItem("emailForSignIn"), oobCode: actionCode }),
           });
-  
+          console.log('response', response);
           if (!response.ok) {
             throw new Error("Failed to update verification status in the backend.");
           }
@@ -35,6 +35,7 @@ const EmailVerification = () => {
           setVerifying(false);
           setTimeout(() => navigate("/login"), 3000);
         } catch (error) {
+          alert(error);
           setError("Email verification failed. Please try again.");
           console.error(error);
         }
