@@ -11,24 +11,22 @@ const EmailVerification = () => {
 
   useEffect(() => {
     const verifyEmail = async () => {
-      console.log('verification url', window.location.href);
-      console.log('searchParams', location.search);
       const actionCode = new URLSearchParams(location.search).get("oobCode");
-      console.log('actionCode', actionCode);
       if (actionCode) {
         try {
-          const check = await applyActionCode(auth, actionCode);
-          console.log('check', check);
-          console.log('getEmail', window.localStorage.getItem("emailForSignIn"));
+          await applyActionCode(auth, actionCode);
+          const email = new URLSearchParams(location.search).get("email") ? new URLSearchParams(location.search).get("email") : window.localStorage.getItem("emailForSignIn");
+          if(!email){
+            throw new Error("Email not found");
+          }
           // Send request to backend to update `hasVerified`
           const response = await fetch("https://firebase-backend-one.vercel.app/api/auth/verify-email", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email : "vinaybadola46@gmail.com", oobCode: actionCode }),
+            body: JSON.stringify({ email : email}),
           });
-          console.log('response', response);
           if (!response.ok) {
             throw new Error("Failed to update verification status in the backend.");
           }
