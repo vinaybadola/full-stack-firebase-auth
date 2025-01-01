@@ -22,55 +22,61 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleRegister = async e => {
-    e.preventDefault()
-    setError("")
-    setSuccess("")
-    setLoading(true)
-
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
+  
     if (formData.password !== formData.confirm_password) {
       alert("Passwords do not match");
-      setError("Passwords do not match")
-      setLoading(false)
-      return
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
     }
-
+  
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/auth/register`,
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(formData),
         }
-      )
-
+      );
+  
+      // Check if the response is OK (status code 2xx)
       if (!response.ok) {
-        const errorData = await response.json()
+        // Try to parse the error response as JSON
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (jsonError) {
+          // If the response is not JSON, use the status text
+          errorData = { message: response.statusText || "Registration failed" };
+        }
         alert(errorData.message || "Registration failed");
-        throw new Error(errorData.message || "Registration failed")
+        throw new Error(errorData.message || "Registration failed");
       }
-      window.localStorage.setItem("emailForSignIn", formData.email)
-
-      setSuccess("Registration successful. Redirecting to the homepage...")
+  
+      // Handle successful response
+      // const data = await response.json();
+      window.localStorage.setItem("emailForSignIn", formData.email);
+  
+      setSuccess("Registration successful. Redirecting to the homepage...");
       setTimeout(() => {
-        alert("Registration successful.Check you mail for verification Link")
-        navigate("/")
-      }, 2000)
+        alert("Registration successful. Check your mail for verification link");
+        navigate("/");
+      }, 2000);
     } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-        console.error('Error:', error)
-        setError(error.message)
-      } else {
-        setError("An unexpected error occurred")
-      }
+      console.error("Error:", error);
+      setError(error.message || "An unexpected error occurred");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen">

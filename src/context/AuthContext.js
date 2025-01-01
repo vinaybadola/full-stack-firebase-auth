@@ -1,16 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { auth } from "../config/Firebase";
-import {jwtDecode} from "jwt-decode";
 
 const AuthContext = createContext({ user: null, loading: true });
 
 export const useAuth = () => useContext(AuthContext);
-
-// const isTokenValid = (token) => {
-//   if (!token) return false;
-//   const decoded = jwtDecode(token);
-//   return decoded.exp * 1000 > Date.now();
-// };
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -22,13 +15,14 @@ export const AuthProvider = ({ children }) => {
         try {
           const firebaseToken = await firebaseUser.getIdToken();
 
+          // Exchange Firebase token for backend token
           const response = await fetch(
             `${process.env.REACT_APP_API_URL}/auth/api/exchange-token`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ firebaseToken }),
-              credentials: "include", 
+              credentials: "include", // Include cookies in the request
             }
           );
 
@@ -36,18 +30,18 @@ export const AuthProvider = ({ children }) => {
             throw new Error("Failed to exchange token.");
           }
 
-          setUser(firebaseUser);
+          setUser(firebaseUser); // Set the user state
         } catch (error) {
           console.error("Authentication error:", error);
           setUser(null);
         }
       } else {
-        setUser(null);
+        setUser(null); // No user is logged in
       }
-      setLoading(false);
+      setLoading(false); // Set loading to false
     });
 
-    return unsubscribe;
+    return unsubscribe; // Clean up the onAuthStateChanged listener
   }, []);
 
   return (

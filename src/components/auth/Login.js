@@ -20,7 +20,6 @@ const Login = () => {
       const user = userCredential.user
 
       if (user.emailVerified) {
-        const idToken = await user.getIdToken()
         const response = await fetch("http://localhost:5000/api/auth/login", {
           method: "POST",
           headers: {
