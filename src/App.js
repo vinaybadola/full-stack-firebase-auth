@@ -13,7 +13,7 @@ const PrivateRoute = ({ element }) => {
     return <div>Loading...</div>;
   }
 
-  return user ? element : <Navigate to="/login" />;
+  return user ? <Navigate to="/dashboard" /> : element;
 };
 
 const App = () => {

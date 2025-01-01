@@ -1,5 +1,7 @@
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import '../../styles/auth/register.css'
+import { Link } from "react-router-dom"
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -27,6 +29,7 @@ const Register = () => {
     setLoading(true)
 
     if (formData.password !== formData.confirm_password) {
+      alert("Passwords do not match");
       setError("Passwords do not match")
       setLoading(false)
       return
@@ -34,7 +37,7 @@ const Register = () => {
 
     try {
       const response = await fetch(
-        "https://firebase-backend-one.vercel.app/api/auth/register",
+        `${process.env.REACT_APP_API_URL}/auth/register`,
         {
           method: "POST",
           headers: {
@@ -46,17 +49,20 @@ const Register = () => {
 
       if (!response.ok) {
         const errorData = await response.json()
+        alert(errorData.message || "Registration failed");
         throw new Error(errorData.message || "Registration failed")
       }
-      window.localStorage.setItem("emailForSignIn", formData.email);
+      window.localStorage.setItem("emailForSignIn", formData.email)
 
       setSuccess("Registration successful. Redirecting to the homepage...")
       setTimeout(() => {
+        alert("Registration successful.Check you mail for verification Link")
         navigate("/")
-      }, 2000) // Redirect after 2 seconds
+      }, 2000)
     } catch (error) {
       if (error instanceof Error) {
-        alert('error', error);
+        alert(error.message);
+        console.error('Error:', error)
         setError(error.message)
       } else {
         setError("An unexpected error occurred")
@@ -67,123 +73,183 @@ const Register = () => {
   }
 
   return (
-    <form onSubmit={handleRegister} className="max-w-md mx-auto mt-8 space-y-6">
-      <div className="rounded-md shadow-sm -space-y-px">
-        <div>
-          <input
-            name="first_name"
-            type="text"
-            required
-            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            placeholder="First Name"
-            value={formData.first_name}
-            onChange={handleChange}
-          />
+    <div className="min-h-screen">
+      <div className="container">
+        <div className="header">
+          <h2>Create your account</h2>
         </div>
-        <div>
-          <input
-            name="last_name"
-            type="text"
-            required
-            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            placeholder="Last Name"
-            value={formData.last_name}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <input
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            placeholder="Email address"
-            value={formData.email}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <input
-            name="phone"
-            type="tel"
-            required
-            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            placeholder="Phone Number"
-            value={formData.phone}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <input
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <input
-            name="confirm_password"
-            type="password"
-            autoComplete="new-password"
-            required
-            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-            placeholder="Confirm Password"
-            value={formData.confirm_password}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
 
-      <div>
-        <button
-          type="submit"
-          disabled={loading}
-          className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-            loading ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-700"
-          } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
-        >
-          {loading ? (
-            <div className="flex items-center">
-              <span className="loader mr-2"></span> Registering...
+        <div className="form-container">
+          <div className="social-buttons">
+            <button type="button" className="social-button">
+              <svg className="social-icon" viewBox="0 0 24 24">
+                <path
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  fill="#EA4335"
+                />
+              </svg>
+              Google
+            </button>
+            <button type="button" className="social-button">
+              <svg className="social-icon" fill="#1877F2" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              Facebook
+            </button>
+          </div>
+
+          <div className="divider">
+            <span>Or continue with</span>
+          </div>
+
+          <form onSubmit={handleRegister} className="form">
+            <div className="form-grid">
+              <div className="form-group">
+                <label htmlFor="first_name" className="form-label">
+                  First Name
+                </label>
+                <input
+                  id="first_name"
+                  name="first_name"
+                  type="text"
+                  required
+                  className="form-input"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="last_name" className="form-label">
+                  Last Name
+                </label>
+                <input
+                  id="last_name"
+                  name="last_name"
+                  type="text"
+                  required
+                  className="form-input"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
-          ) : (
-            "Register"
+
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                className="form-input"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="phone" className="form-label">
+                Phone Number
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                required
+                className="form-input"
+                value={formData.phone}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                className="form-input"
+                value={formData.password}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="confirm_password" className="form-label">
+                Confirm Password
+              </label>
+              <input
+                id="confirm_password"
+                name="confirm_password"
+                type="password"
+                required
+                className="form-input"
+                value={formData.confirm_password}
+                onChange={handleChange}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="submit-button"
+            >
+              {loading ? (
+                <div className="loading-spinner">
+                  <svg className="spinner-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Registering...
+                </div>
+              ) : (
+                "Register"
+              )}
+            </button>
+          </form>
+
+          {error && (
+            <div className="alert alert-error">
+              <div className="alert-content">
+                <h3 className="alert-title">Error</h3>
+                <p className="alert-message">{error}</p>
+              </div>
+            </div>
           )}
-        </button>
+
+          {success && (
+            <div className="alert alert-success">
+              <div className="alert-content">
+                <h3 className="alert-title">Success</h3>
+                <p className="alert-message">{success}</p>
+              </div>
+            </div>
+          )}
+      <div>
+        <p className="login-text">
+          Already have an account? <Link to="/login" className="login-link">Login</Link>
+        </p>
       </div>
-
-      {error && (
-        <div className="rounded-md bg-red-50 p-4">
-          <div className="flex">
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>{error}</p>
-              </div>
-            </div>
-          </div>
         </div>
-      )}
-
-      {success && (
-        <div className="rounded-md bg-green-50 p-4">
-          <div className="flex">
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-green-800">Success</h3>
-              <div className="mt-2 text-sm text-green-700">
-                <p>{success}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </form>
+      </div>
+    </div>
   )
 }
 
