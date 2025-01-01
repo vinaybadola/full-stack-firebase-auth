@@ -72,7 +72,7 @@ const Register = () => {
       }, 2000);
     } catch (error) {
       console.error("Error:", error);
-      setError(error.message || "An unexpected error occurred");
+      setError(error || "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
