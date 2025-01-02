@@ -7,9 +7,6 @@ import "../../styles/auth/emailVerification.css";
 const EmailVerification = () => {
   const [verifying, setVerifying] = useState(true);
   const [error, setError] = useState("");
-  const [email, setEmail] = useState("");
-  const [isResending, setIsResending] = useState(false);
-  const [resendSuccess, setResendSuccess] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -59,40 +56,6 @@ const EmailVerification = () => {
     verifyEmail();
   }, [location, navigate]);
 
-  const handleResendVerification = async () => {
-    if (!email) {
-      alert("Please enter your email.");
-      return;
-    }
-
-    setIsResending(true);
-    setError("");
-    setResendSuccess(false);
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/auth/resend-verification-email`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to resend verification link.");
-      }
-
-      setResendSuccess(true);
-    } catch (error) {
-      setError(error.message || "An error occurred while resending the verification link.");
-    } finally {
-      setIsResending(false);
-    }
-  };
 
   if (verifying) {
     return (
@@ -107,20 +70,6 @@ const EmailVerification = () => {
     return (
       <div className="verification-container error-message">
         <p>{error}</p>
-        <div>
-          <p>You can fill the form below to request a new verification link.</p>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <button onClick={handleResendVerification} disabled={isResending}>
-            {isResending ? "Sending..." : "Send verification link"}
-          </button>
-          {resendSuccess && <p>Verification link sent successfully!</p>}
-          <button onClick={() => navigate("/dashboard")}>Back to dashboard</button>
-        </div>
       </div>
     );
   }
