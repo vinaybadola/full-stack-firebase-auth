@@ -6,6 +6,7 @@ import Login from './components/auth/Login';
 import EmailVerification from './components/auth/EmailVerification';
 import Dashboard from './components/auth/Dashboard';
 import ResendVerificationEmail from './components/auth/ResendVerification';
+import Layout from './components/layout/Layout'; 
 
 const PrivateRoute = ({ element }) => {
   const { user, loading } = useAuth();
@@ -14,21 +15,23 @@ const PrivateRoute = ({ element }) => {
     return <div>Loading...</div>;
   }
 
-  return user ? <Navigate to="/dashboard" /> : element;
+  return user ? element : <Navigate to="/login" />;
 };
 
 const App = () => {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/verify-email" element={<EmailVerification />} />
-          <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/resend-verification" element={<ResendVerificationEmail />} />
-        </Routes>
+        <Layout> 
+          <Routes>
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/verify-email" element={<EmailVerification />} />
+            <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
+            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/resend-verification" element={<ResendVerificationEmail />} />
+          </Routes>
+        </Layout>
       </Router>
     </AuthProvider>
   );
